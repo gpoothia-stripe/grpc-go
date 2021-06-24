@@ -20,38 +20,41 @@
 package main
 
 import (
-	"context"
-	"log"
-	"net"
+  "context"
+  "log"
+  "net"
 
-	"google.golang.org/grpc"
-	pb "google.golang.org/grpc/examples/helloworld/helloworld"
+  "google.golang.org/grpc"
+  pb "google.golang.org/grpc/examples/helloworld/helloworld"
+    "google.golang.org/grpc/reflection"
 )
 
 const (
-	port = ":50051"
+  port = ":31001"
 )
 
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	pb.UnimplementedGreeterServer
+  pb.UnimplementedTrafficTestApiServer
 }
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
+
+func (s *server) TrafficRequest(ctx context.Context, in *pb.TrafficTestRequest) (*pb.TrafficTestResponse, error) {
+  // TODO: Add support for extracting response size and latency injection requested by client.
+  // For now just return a 10 bytes hardcoded string in response with 0 latency
+  return &pb.TrafficTestResponse{Message: "abcdefghij"}, nil
 }
 
 func main() {
-	lis, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{})
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+  lis, err := net.Listen("tcp", port)
+  if err != nil {
+    log.Fatalf("failed to listen: %v", err)
+  }
+  s := grpc.NewServer()
+  pb.RegisterTrafficTestApiServer(s, &server{})
+  reflection.Register(s)
+  log.Printf("server listening at %v", lis.Addr())
+  if err := s.Serve(lis); err != nil {
+    log.Fatalf("failed to serve: %v", err)
+  }
 }

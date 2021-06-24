@@ -19,20 +19,17 @@ option java_multiple_files = true;
 option java_package = "io.grpc.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
 
-package helloworld;
+package traffic.api;
 
-// The greeting service definition.
-service Greeter {
-  // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {}
+service TrafficTestApi {
+  rpc TrafficRequest (TrafficTestRequest) returns (TrafficTestResponse);
 }
 
-// The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+message TrafficTestRequest {
+  int32 response_size_bytes = 1;
+  int32 response_latency_ms = 2;
 }
 
-// The response message containing the greetings
-message HelloReply {
-  string message = 1;
+message TrafficTestResponse {
+      string message = 1;
 }
